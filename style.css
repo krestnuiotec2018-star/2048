@@ -73,6 +73,29 @@ body {
   gap: 12px;
 }
 
+.btn-group {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cheat-btn {
+  background-color: #776e65;
+  color: #f9f6f2;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  white-space: nowrap;
+}
+
+.cheat-btn:hover  { background-color: #6b6258; }
+.cheat-btn.active { background-color: #f65e3b; }
+.cheat-btn.active:hover { background-color: #d94e2e; }
+
 .hint {
   font-size: 14px;
   color: #776e65;
@@ -150,10 +173,21 @@ body {
   align-items: center;
   border-radius: 6px;
   font-weight: 900;
-  transition: transform 0.1s ease;
-  animation: tile-appear 0.12s ease;
   grid-column: var(--col);
   grid-row: var(--row);
+  cursor: default;
+}
+
+.tile.is-new {
+  animation: tile-appear 0.12s ease;
+}
+
+.tile.selected {
+  outline: 3px solid #fff;
+  outline-offset: -3px;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.35);
+  z-index: 2;
+  cursor: pointer;
 }
 
 @keyframes tile-appear {
