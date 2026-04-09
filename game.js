@@ -16,8 +16,6 @@ const messageTextEl = document.getElementById('messageText');
 const newGameBtn = document.getElementById('newGameBtn');
 const tryAgainBtn = document.getElementById('tryAgainBtn');
 
-/* ─── Board helpers ─────────────────────────────────── */
-
 function emptyBoard() {
   return Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(0));
 }
@@ -38,8 +36,6 @@ function addRandomTile() {
   spawnTile(r, c, board[r][c], true);
 }
 
-/* ─── Rendering ─────────────────────────────────────── */
-
 function renderAll() {
   tilesContainer.innerHTML = '';
   for (let r = 0; r < BOARD_SIZE; r++)
@@ -49,7 +45,7 @@ function renderAll() {
 
 function spawnTile(row, col, value, animate) {
   const tile = document.createElement('div');
-  tile.className = 'tile' + (animate ? '' : '');
+  tile.className = 'tile';
   tile.dataset.value = value;
   tile.style.setProperty('--row', row + 1);
   tile.style.setProperty('--col', col + 1);
@@ -65,7 +61,6 @@ function updateScoreDisplay(delta) {
     localStorage.setItem('2048-best', bestScore);
   }
   bestEl.textContent = bestScore;
-
   if (delta > 0) showScoreDelta(delta);
 }
 
@@ -81,14 +76,9 @@ function showScoreDelta(delta) {
   el.addEventListener('animationend', () => el.remove());
 }
 
-/* ─── Move logic ────────────────────────────────────── */
-
-// Slides and merges a single row/column array to the left
 function slideLine(line) {
-  // Remove zeros
   let arr = line.filter(v => v !== 0);
   let merged = 0;
-  // Merge adjacent equal
   for (let i = 0; i < arr.length - 1; i++) {
     if (arr[i] === arr[i + 1]) {
       arr[i] *= 2;
@@ -96,7 +86,6 @@ function slideLine(line) {
       arr.splice(i + 1, 1);
     }
   }
-  // Pad with zeros
   while (arr.length < BOARD_SIZE) arr.push(0);
   return { arr, merged };
 }
@@ -111,9 +100,7 @@ function reverseRows(b) {
 
 function move(direction) {
   if (gameOver) return false;
-
   let rotated = board.map(r => [...r]);
-  // Transform board so we always slide "left"
   if (direction === 'right') rotated = reverseRows(rotated);
   if (direction === 'up')    rotated = transpose(rotated);
   if (direction === 'down')  rotated = reverseRows(transpose(rotated));
@@ -131,7 +118,6 @@ function move(direction) {
 
   if (!changed) return false;
 
-  // Reverse transform
   let result = newBoard;
   if (direction === 'right') result = reverseRows(result);
   if (direction === 'up')    result = transpose(result);
@@ -145,8 +131,6 @@ function move(direction) {
   checkState();
   return true;
 }
-
-/* ─── Win / lose detection ──────────────────────────── */
 
 function hasWon() {
   return board.some(row => row.some(v => v === 2048));
@@ -184,8 +168,6 @@ function hideMessage() {
   messageEl.style.display = 'none';
 }
 
-/* ─── New game ──────────────────────────────────────── */
-
 function newGame() {
   board = emptyBoard();
   score = 0;
@@ -199,8 +181,6 @@ function newGame() {
   addRandomTile();
 }
 
-/* ─── Input handlers ────────────────────────────────── */
-
 document.addEventListener('keydown', e => {
   const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
   if (map[e.key]) {
@@ -209,7 +189,6 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Touch / swipe
 let touchStartX = 0;
 let touchStartY = 0;
 
@@ -223,7 +202,7 @@ document.addEventListener('touchend', e => {
   const dy = e.changedTouches[0].clientY - touchStartY;
   const absDx = Math.abs(dx);
   const absDy = Math.abs(dy);
-  if (Math.max(absDx, absDy) < 20) return; // too small
+  if (Math.max(absDx, absDy) < 20) return;
   if (absDx > absDy) {
     move(dx > 0 ? 'right' : 'left');
   } else {
@@ -231,7 +210,6 @@ document.addEventListener('touchend', e => {
   }
 }, { passive: true });
 
-/* "Keep playing" after win */
 tryAgainBtn.addEventListener('click', () => {
   if (won && !gameOver) {
     keepPlaying = true;
@@ -243,6 +221,5 @@ tryAgainBtn.addEventListener('click', () => {
 
 newGameBtn.addEventListener('click', newGame);
 
-/* ─── Init ──────────────────────────────────────────── */
 bestEl.textContent = bestScore;
 newGame();
