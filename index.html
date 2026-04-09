@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>2048</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title">2048</div>
+      <div class="scores">
+        <div class="score-box">
+          <div class="score-label">SCORE</div>
+          <div class="score-value" id="score">0</div>
+        </div>
+        <div class="score-box">
+          <div class="score-label">BEST</div>
+          <div class="score-value" id="best">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subtitle">
+      <div class="hint">Свайп для перемещения<br><span class="hint-math">2+2=4</span> <strong>Достигни 2048</strong></div>
+      <button class="new-game-btn" id="newGameBtn">Новая игра</button>
+    </div>
+
+    <div class="board" id="board">
+      <div class="grid-background">
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      </div>
+      <div class="tiles-container" id="tilesContainer"></div>
+    </div>
+
+    <div class="message" id="message" style="display:none;">
+      <div class="message-content">
+        <div class="message-text" id="messageText"></div>
+        <button class="new-game-btn" id="tryAgainBtn">Играть снова</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
