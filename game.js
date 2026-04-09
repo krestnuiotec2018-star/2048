@@ -263,19 +263,14 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Touch handling — distinguish tap vs swipe
 let touchStartX = 0;
 let touchStartY = 0;
-let touchMoved  = false;
+// After a touch-tap we block the synthetic click iOS fires ~300ms later
+let touchJustHandled = false;
 
 document.addEventListener('touchstart', e => {
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
-  touchMoved  = false;
-}, { passive: true });
-
-document.addEventListener('touchmove', () => {
-  touchMoved = true;
 }, { passive: true });
 
 document.addEventListener('touchend', e => {
@@ -284,23 +279,21 @@ document.addEventListener('touchend', e => {
   const dist = Math.max(Math.abs(dx), Math.abs(dy));
 
   if (cheatMode && dist < 20) {
-    // It's a tap — handle cheat
+    touchJustHandled = true;
+    setTimeout(() => { touchJustHandled = false; }, 600);
     const cell = clientToCell(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     if (cell) cheatTap(cell.r, cell.c);
     return;
   }
 
-  if (dist < 20) return; // too small to be a swipe
-  if (Math.abs(dx) > Math.abs(dy)) {
-    move(dx > 0 ? 'right' : 'left');
-  } else {
-    move(dy > 0 ? 'down' : 'up');
-  }
+  if (dist < 20) return;
+  if (Math.abs(dx) > Math.abs(dy)) move(dx > 0 ? 'right' : 'left');
+  else move(dy > 0 ? 'down' : 'up');
 }, { passive: true });
 
-// Mouse click for cheat mode (desktop / iPad)
+// Mouse click for cheat mode (desktop only — blocked after touch)
 document.getElementById('board').addEventListener('click', e => {
-  if (!cheatMode) return;
+  if (!cheatMode || touchJustHandled) return;
   const cell = clientToCell(e.clientX, e.clientY);
   if (cell) cheatTap(cell.r, cell.c);
 });
