@@ -96,8 +96,8 @@ function slideLine(line) {
   return { arr, merged };
 }
 
-function transpose(b)   { return b[0].map((_, c) => b.map(row => row[c])); }
-function reverseRows(b) { return b.map(row => [...row].reverse()); }
+function transpose(b)    { return b[0].map((_, c) => b.map(row => row[c])); }
+function reverseRows(b)  { return b.map(row => [...row].reverse()); }
 
 function move(direction) {
   if (gameOver || cheatMode) return false;
@@ -152,12 +152,12 @@ function hasMovesLeft() {
 function checkState() {
   if (!won && hasWon() && !keepPlaying) {
     won = true;
-    showMessage('Ты выиграл!');
+    showMessage('\u0422\u044b \u0432\u044b\u0438\u0433\u0440\u0430\u043b!');
     return;
   }
   if (!hasMovesLeft()) {
     gameOver = true;
-    showMessage('Игра окончена!');
+    showMessage('\u0418\u0433\u0440\u0430 \u043e\u043a\u043e\u043d\u0447\u0435\u043d\u0430!');
   }
 }
 
@@ -175,7 +175,7 @@ function hideMessage() {
 function toggleCheat() {
   cheatMode = !cheatMode;
   cheatBtn.classList.toggle('active', cheatMode);
-  cheatBtn.textContent = cheatMode ? 'Читы ВКЛ' : 'Читы';
+  cheatBtn.textContent = cheatMode ? '\u0427\u0438\u0442\u044b \u0412\u041a\u041b' : '\u0427\u0438\u0442\u044b';
   clearSelection();
 }
 
@@ -236,14 +236,17 @@ function newGame() {
   addRandomTile();
 }
 
-/* ─── Input ──────────────────────────────── */
+/* ─── Input handlers ──────────────────────── */
 
 document.addEventListener('keydown', e => {
   const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
   if (map[e.key]) { e.preventDefault(); move(map[e.key]); }
 });
 
-let touchStartX = 0, touchStartY = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+// After a touch-tap we block the synthetic click iOS fires ~300ms later
+let touchJustHandled = false;
 
 document.addEventListener('touchstart', e => {
   touchStartX = e.touches[0].clientX;
@@ -256,6 +259,8 @@ document.addEventListener('touchend', e => {
   const dist = Math.max(Math.abs(dx), Math.abs(dy));
 
   if (cheatMode && dist < 20) {
+    touchJustHandled = true;
+    setTimeout(() => { touchJustHandled = false; }, 600);
     const cell = clientToCell(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     if (cell) cheatTap(cell.r, cell.c);
     return;
@@ -266,17 +271,20 @@ document.addEventListener('touchend', e => {
   else move(dy > 0 ? 'down' : 'up');
 }, { passive: true });
 
+// Mouse click for cheat mode (desktop only — blocked after touch)
 document.getElementById('board').addEventListener('click', e => {
-  if (!cheatMode) return;
+  if (!cheatMode || touchJustHandled) return;
   const cell = clientToCell(e.clientX, e.clientY);
   if (cell) cheatTap(cell.r, cell.c);
 });
 
 cheatBtn.addEventListener('click', toggleCheat);
+
 tryAgainBtn.addEventListener('click', () => {
   if (won && !gameOver) { keepPlaying = true; hideMessage(); }
   else newGame();
 });
+
 newGameBtn.addEventListener('click', newGame);
 
 bestEl.textContent = bestScore;
